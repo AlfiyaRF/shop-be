@@ -1,39 +1,39 @@
-import productsList from './productsList.json';
+import {selectAllProducts} from '../db/selectAllProducts';
 
 export const getProductsList = async (event) => {
-    const errorMessage = {message: 'Product not found'};
+    const error= {message: 'Product not found'};
     try {
-        const products = await productsList;
-        if (products.length) {
+        const data = await selectAllProducts();
+        if (data.status === 200) {
             return {
-                statusCode: 200,
+                statusCode: data.status,
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': true,
                 },
-                body: JSON.stringify(products)
+                body: JSON.stringify(data.products)
             };
         } else {
             return {
-                statusCode: 200,
+                statusCode: data.status,
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': true,
                 },
-                body: JSON.stringify(errorMessage)
+                body: JSON.stringify(data.error)
             };
         }
     } catch (err) {
         return {
-            statusCode: 200,
+            statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': true,
             },
-            body: JSON.stringify(err)
+            body: JSON.stringify(error)
         };
     }
 };

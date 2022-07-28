@@ -1,15 +1,12 @@
-import productsList from './productsList.json';
-
-async function findProductById(id) {
-    return productsList.find(product => product.id === id);
-}
+import {selectProductById} from '../db/selectProductById';
 
 export const getProductsById = async (event) => {
     const productId = event.pathParameters.productId;
-    const product = await findProductById(productId);
+    const data = await selectProductById(productId);
     const errorMessage = {message: 'Product not found'};
+
     try {
-        if (product) {
+        if (data.status === 200) {
             return {
                 statusCode: 200,
                 headers: {
@@ -17,28 +14,28 @@ export const getProductsById = async (event) => {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': true,
                 },
-                body: JSON.stringify(product)
+                body: JSON.stringify(data.product)
             };
         } else {
             return {
-                statusCode: 200,
+                statusCode: data.status,
                 headers: {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Credentials': true,
                 },
-                body: JSON.stringify(errorMessage)
+                body: JSON.stringify(data.error)
             };
         }
     } catch (err) {
         return {
-            statusCode: 200,
+            statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': true,
             },
-            body: JSON.stringify(err)
+            body: JSON.stringify(errorMessage)
         };
     }
 };
