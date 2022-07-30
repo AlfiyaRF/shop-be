@@ -13,7 +13,7 @@ export const insertProduct = async (title, description, price, count) => {
         `);
         const stockVariable = `('${id[0].id}', ${count})`;
         const {rows: result} = await client.query(`
-            INSERT INTO public.stocks (product_id, count) VALUES ${stockVariable}
+            INSERT INTO public.stocks (product_id, count) VALUES ${stockVariable} RETURNING product_id
         `);
         return result;
     } catch (err) {
