@@ -1,0 +1,48 @@
+service: product-service
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+
+plugins:
+  - serverless-webpack
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+    packager: 'npm'
+
+  environment:
+    PG_HOST: ${env:AWS_PG_HOST}
+    PG_PORT: ${env:AWS_PG_PORT}
+    PG_DATABASE: ${env:AWS_PG_DATABASE}
+    PG_USERNAME: ${env:AWS_PG_USERNAME}
+    PG_PASSWORD: ${env:AWS_PG_PASSWORD}
+
+functions:
+  getProductsList:
+    handler: handler.getProductsList
+    events:
+      - http:
+          path: products
+          method: get
+          cors: true
+  getProductsById:
+    handler: handler.getProductsById
+    events:
+      - http:
+          path: products/{productId}
+          method: get
+          cors: true
+  createProduct:
+    handler: handler.createProduct
+    events:
+      - http:
+          path: products
+          method: post
+          cors: true
