@@ -1,39 +1,15 @@
 import {selectAllProducts} from '../db/selectAllProducts';
+import createResponse from '../utils/createResponse';
 
 export const getProductsList = async (event) => {
-    const error= {message: 'Product not found'};
     try {
         const data = await selectAllProducts();
         if (data.status === 200) {
-            return {
-                statusCode: data.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': true,
-                },
-                body: JSON.stringify(data.products)
-            };
+            return createResponse(data.status, data.products);
         } else {
-            return {
-                statusCode: data.status,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*',
-                    'Access-Control-Allow-Credentials': true,
-                },
-                body: JSON.stringify(data.error)
-            };
+            return createResponse(data.status, data.error);
         }
     } catch (err) {
-        return {
-            statusCode: 500,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify(error)
-        };
+        return createResponse(500, JSON.stringify({message: 'Product not found'}));
     }
 };

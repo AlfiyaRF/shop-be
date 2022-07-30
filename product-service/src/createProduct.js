@@ -1,39 +1,22 @@
 import {insertProduct} from '../db/insertProduct';
+import createResponse from '../utils/createResponse';
 
 export const createProduct = async (request) => {
-    const error = {message: 'Product was not created'};
     const {title, description, price} = JSON.parse(request.body);
+
     try {
         const {title, description, price, count} = JSON.parse(request.body);
         if (title && description && price && count) {
             const success = await insertProduct(title, description, price, count);
             if (success) {
-                return {
-                    statusCode: 200,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*',
-                        'Access-Control-Allow-Credentials': true,
-                    }
-                };
+                return createResponse(200);
+            } else {
+                return createResponse(404, {message: 'Error with creating product'});
             }
+        } else {
+            return createResponse(400, {message: 'Please provide full information'});
         }
-        return {
-            statusCode: 400,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            }
-        };
     } catch (err) {
-        return {
-            statusCode: 500,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            }
-        };
+        return createResponse(500, {message: 'Product was not created'});
     }
 };
