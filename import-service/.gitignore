@@ -5,3 +5,5 @@ lib
 
 # Serverless directories
 .serverless
+
+package-lock.json

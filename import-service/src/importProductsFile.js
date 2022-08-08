@@ -1,32 +1,28 @@
 import AWS from 'aws-sdk';
-const BUCKET = 'alfiia-import-service';
+import createResponse from '../utils/createResponse';
 
 export const importProductsFile = async (event) => {
-    const s3 = new AWS.S3({region: 'eu-west-1'});
+    console.log('importProductsFile function');
+    const BUCKET = 'alfiia-import-service-bucket';
     let status = 200;
-    let uploaded = [];
-    const params = {
-        Bucket: BUCKET,
-        Prefix: 'uploaded/'
-    };
+    let body = {};
 
     try {
-        const s3Response = await s3.listObjectsV2(params).promise();
-        uploaded = s3Response.Contents;
+        const fileName = event.queryStringParameters.name;
+        const s3 = new AWS.S3({region: 'eu-west-1'});
+
+        const params = {
+            Bucket: BUCKET,
+            Key: `uploaded/${fileName}`,
+            Expires: 60,
+            ContentType: 'text/csv'
+        };
+        const url = s3.getSignedUrl('putObject', params);
+        body = {url};
     } catch (error) {
         console.error(error);
         status = 500;
+        body = {error};
     }
-
-    const response = {
-        statusCode: status,
-        headers: {
-            'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(
-            uploaded.filter(file => file.Size)
-                .map(file => `https://${BUCKET}.s3.amazonaws.com/${file.Key}`)
-        )
-    };
-    return response;
+    return createResponse(status, body);
 };

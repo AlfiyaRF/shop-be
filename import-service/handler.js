@@ -1,3 +1,4 @@
-import {teimportProductsFilest} from './src/importProductsFile';
+import {importProductsFile} from './src/importProductsFile';
+import {importFileParser} from './src/importFileParser';
 
-export default {importProductsFile};
+export {importProductsFile, importFileParser};
