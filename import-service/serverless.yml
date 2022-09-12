@@ -8,15 +8,20 @@ provider:
   stage: dev
   region: eu-west-1
 
-  iamRoleStatements:
-    - Effect: "Allow"
-      Action: "s3:ListBucket"
-      Resource:
-        - "arn:aws:s3:::alfiia-import-service-bucket"
-    - Effect: "Allow"
-      Action: "s3:*"
-      Resource:
-        - "arn:aws:s3:::alfiia-import-service-bucket/*"
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action: "s3:ListBucket"
+          Resource:
+            - "arn:aws:s3:::alfiia-import-service-bucket"
+        - Effect: "Allow"
+          Action: "s3:*"
+          Resource:
+            - "arn:aws:s3:::alfiia-import-service-bucket/*"
+        - Effect: "Allow"
+          Action: "sqs:SendMessage"
+          Resource: "arn:aws:sqs:eu-west-1:562467770486:catalogItemsQueue"
 
 plugins:
   - serverless-webpack

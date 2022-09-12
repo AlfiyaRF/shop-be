@@ -8,6 +8,17 @@ provider:
   stage: dev
   region: eu-west-1
 
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: sqs:SendMessage
+          Resource: arn:aws:sqs:eu-west-1:562467770486:catalogItemsQueue
+        - Effect: Allow
+          Action: sns:*
+          Resource:
+            Ref: ProductsTopic
+
 plugins:
   - serverless-webpack
 
@@ -46,3 +57,26 @@ functions:
           path: products
           method: post
           cors: true
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn: arn:aws:sqs:eu-west-1:562467770486:catalogItemsQueue
+          batchSize: 5
+
+resources:
+  Resources:
+    CatalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+    ProductsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+    SNSSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: faizralf@gmail.com
+        Protocol: email
+        TopicArn: arn:aws:sns:eu-west-1:562467770486:createProductTopic
